@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>FULL NAME</th>
+                <th>CITY</th>
+                <th>GPA</th>
+                <th>DETAILS</th>
+                <th>DELETE</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="teacher: ${teachers}">
+                <td th:text="${teacher.id}"></td>
+                <td th:text="${teacher.fullName}"></td>
+                <td th:text="${teacher.city}"></td>
+                <td th:text="${teacher.gpa}"></td>
+                <td style="width: 8%"> <a> DETAILS </a> </td>
+                <td style="width: 8%">
+                    <form action="/delete" method="post">
+                        <input type="hidden" name="id" th:value="${teacher.id}">
+                        <button>DELETE</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

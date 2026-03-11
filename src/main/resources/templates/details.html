@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:object="${teacher}">
+    <form action="/update" method="post">
+        <input type="hidden" name="id" th:value="${teacher.id}">
+        <input type="text" name="fullName" th:value="${teacher.fullName}">
+        <input type="text" name="city" th:value="${teacher.city}">
+        <input type="text" name="gpa" th:value="${teacher.gpa}">
+        <button>UPDATE</button>
+    </form>
+</div>
+</body>
+</html>
