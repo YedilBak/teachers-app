@@ -1,8 +1,12 @@
 package kz.main.app.controller;
 
+import kz.main.app.entity.Course;
 import kz.main.app.entity.Teacher;
+import kz.main.app.repository.CompanyRepository;
+import kz.main.app.repository.CoursesRepository;
 import kz.main.app.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,22 +14,41 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class TeacherController {
 
     private final TeacherRepository teacherRepository;
+    private final CompanyRepository companyRepository;
+    private final CoursesRepository coursesRepository;
 
     @GetMapping(value = "/")
     public String getMain(Model model){
-        model.addAttribute("teachers", teacherRepository.findAll());
+        model.addAttribute("teachers", teacherRepository.findAll(Sort.by(Sort.Direction.ASC, "id")));
+        return "index";
+    }
+
+    @GetMapping(value = "/poisk")
+    public String getTeachers(Model model,
+                              @RequestParam String search){
+        model.addAttribute("teachers", teacherRepository.getTeacherList(search));
+
         return "index";
     }
 
     @GetMapping(value = "/{id}")
     public String getTeacher(@PathVariable int id,
                              Model model){
-        model.addAttribute("teacher", teacherRepository.findById(id).get());
+        Teacher teacher = teacherRepository.findById(id).get();
+        List<Course> courses = coursesRepository.findAll();
+        courses.removeAll(teacher.getCourses());
+
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("companies", companyRepository.findAll());
+        model.addAttribute("courses", courses);
+
         return "details";
     }
 
@@ -42,7 +65,9 @@ public class TeacherController {
     }
 
     @GetMapping(value = "/add")
-    public String addTeacherPage(){
+    public String addTeacherPage(Model model){
+        model.addAttribute("companies", companyRepository.findAll());
+        model.addAttribute("courses", coursesRepository.findAll());
         return "add-page";
     }
 
@@ -50,6 +75,36 @@ public class TeacherController {
     public String updateTeacher(Teacher teacher){
         teacherRepository.save(teacher);
         return "redirect:/";
+    }
+
+    @PostMapping(value = "/delete-course")
+    public String deleteCourse(@RequestParam int course_id,
+                               @RequestParam int teacher_id){
+
+        Teacher teacher = teacherRepository.findById(teacher_id).get();
+        Course course = coursesRepository.findById(course_id).get();
+
+        teacher.getCourses().remove(course);
+
+        teacherRepository.save(teacher);
+
+        return "redirect:/" + teacher_id;
+
+    }
+
+    @PostMapping(value = "/add-course")
+    public String addCourse(@RequestParam int course_id,
+                               @RequestParam int teacher_id){
+
+        Teacher teacher = teacherRepository.findById(teacher_id).get();
+        Course course = coursesRepository.findById(course_id).get();
+
+        teacher.getCourses().add(course);
+
+        teacherRepository.save(teacher);
+
+        return "redirect:/" + teacher_id;
+
     }
 
 

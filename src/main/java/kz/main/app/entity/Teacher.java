@@ -1,5 +1,6 @@
 package kz.main.app.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,7 +32,7 @@ public class Teacher {
     private double gpa;
     private String city;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_teacher_id")
     private ProfileTeacher profileTeacher;
 

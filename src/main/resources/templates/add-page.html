@@ -3,13 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <div th:insert="links.html"></div>
 </head>
 <body>
-    <form action="/add" method="post">
-        <input type="text" name="fullName" placeholder="full name">
-        <input type="text" name="gpa" placeholder="gpa">
-        <input type="text" name="city" placeholder="city">
-        <button>ADD</button>
-    </form>
+<div th:insert="navbar.html"></div>
+
+<div class="container mt-3">
+
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <form action="/add" method="post">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>FULL NAME:</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="text" name="fullName" class="form-control" >
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>CITY:</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="text" name="city" class="form-control" >
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>GPA:</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="text" name="gpa" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>PROFILE TEACHER (description):</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <textarea class="form-control" name="profileTeacher.description"></textarea>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>PROFILE TEACHER (iin):</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="number" name="profileTeacher.iin" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>COMPANY:</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <select class="form-select" name="company.id">
+                            <option th:each="c: ${companies}"
+                                    th:text="${c.name}"
+                                    th:value="${c.id}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-success btn-sm mt-3">ADD TEACHER</button>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>

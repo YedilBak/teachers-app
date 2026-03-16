@@ -3,16 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <div th:insert="links.html"></div>
+
 </head>
 <body>
-<div th:object="${teacher}">
-    <form action="/update" method="post">
-        <input type="hidden" name="id" th:value="${teacher.id}">
-        <input type="text" name="fullName" th:value="${teacher.fullName}">
-        <input type="text" name="city" th:value="${teacher.city}">
-        <input type="text" name="gpa" th:value="${teacher.gpa}">
-        <button>UPDATE</button>
-    </form>
+
+<div th:insert="navbar.html"></div>
+
+<div class="container mt-3" th:object="${teacher}">
+
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <div class="row">
+                <div class="col-6">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>NAME</th>
+                            <th>HOURS</th>
+                            <th>CABINET</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="c: ${teacher.courses}">
+                            <td th:text="${c.name}"></td>
+                            <td th:text="${c.hours}"></td>
+                            <td th:text="${c.cabinet}"></td>
+
+                            <form action="/delete-course" method="post">
+                                <input type="hidden" name="course_id" th:value="${c.id}">
+                                <input type="hidden" name="teacher_id" th:value="${teacher.id}">
+                                <td> <button class="btn btn-danger btn-sm"> >>> </button></td>
+                            </form>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-6">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>NAME</th>
+                            <th>HOURS</th>
+                            <th>CABINET</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="c: ${courses}">
+                            <td th:text="${c.name}"></td>
+                            <td th:text="${c.hours}"></td>
+                            <td th:text="${c.cabinet}"></td>
+
+                            <form action="/add-course" method="post">
+                                <input type="hidden" name="course_id" th:value="${c.id}">
+                                <input type="hidden" name="teacher_id" th:value="${teacher.id}">
+                                <td> <button class="btn btn-success btn-sm"> <<< </button></td>
+                            </form>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <form action="/update" method="post">
+                <input type="hidden" name="id" th:value="${teacher.id}">
+                <input type="hidden" name="profileTeacher.id" th:value="${teacher.profileTeacher.id}">
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>FULL NAME:</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="text" name="fullName" class="form-control" th:value="${teacher.fullName}">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>CITY:</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="text" name="city" class="form-control" th:value="${teacher.city}">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>GPA:</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <input type="text" name="gpa" class="form-control" th:value="${teacher.gpa}">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <label>COMPANY:</label>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+
+                        <select class="form-select" name="company.id">
+                            <option th:each="c: ${companies}"
+                                    th:text="${c.name}"
+                                    th:value="${c.id}"
+                                    th:selected="${c.id==teacher.company.id}">
+                            </option>
+                        </select>
+
+
+                    </div>
+                </div>
+
+                <button class="btn btn-success btn-sm mt-3">UPDATE</button>
+            </form>
+        </div>
+    </div>
 </div>
+
+
 </body>
 </html>
