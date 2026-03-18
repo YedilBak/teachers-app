@@ -4,6 +4,7 @@ import kz.main.app.entity.Course;
 import kz.main.app.entity.Teacher;
 import kz.main.app.repository.CompanyRepository;
 import kz.main.app.repository.CoursesRepository;
+import kz.main.app.repository.CustomTeacherRepository;
 import kz.main.app.repository.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -23,6 +24,7 @@ public class TeacherController {
     private final TeacherRepository teacherRepository;
     private final CompanyRepository companyRepository;
     private final CoursesRepository coursesRepository;
+    private final CustomTeacherRepository customTeacherRepository;
 
     @GetMapping(value = "/")
     public String getMain(Model model){
@@ -105,6 +107,30 @@ public class TeacherController {
 
         return "redirect:/" + teacher_id;
 
+    }
+
+    @GetMapping(value = "/gpa-more")
+    public String getTeachersByGpaMore(@RequestParam Double gpa,
+                                       Model model){
+        model.addAttribute("teachers", customTeacherRepository.getTeachersByGpaMore(gpa));
+
+        return "index";
+    }
+
+    @GetMapping(value = "/gpa-and-name")
+    public String getTeachersByGpaAndName(@RequestParam(required = false) Double gpa,
+                                          @RequestParam(required = false) String fullName,
+                                          Model model){
+        model.addAttribute("teachers", customTeacherRepository.getTeachersByGpaAndFullName(gpa, fullName));
+
+        return "index";
+    }
+
+    @GetMapping(value = "/gpa-sort")
+    public String getTeachersSortByGpa(Model model){
+        model.addAttribute("teachers", customTeacherRepository.getTeachersByGpaSort());
+
+        return "index";
     }
 
 
