@@ -1,6 +1,8 @@
 package kz.main.app.repository;
 
 import kz.main.app.entity.Teacher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,4 +16,10 @@ public interface TeacherRepository extends JpaRepository<Teacher, Integer> {
             "WHERE teacher.fullName ilike concat('%', :search, '%')" +
             "OR teacher.company.name ilike concat('%', :search, '%')")
     List<Teacher> getTeacherList(String search);
+
+    Page<Teacher> findAll(Pageable pageable);
+
+    Page<Teacher> findByGpaGreaterThan(double gpa, Pageable pageable);
+
+
 }
