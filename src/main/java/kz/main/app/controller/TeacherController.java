@@ -3,10 +3,11 @@ package kz.main.app.controller;
 import kz.main.app.entity.Course;
 import kz.main.app.entity.Teacher;
 import kz.main.app.repository.CompanyRepository;
-import kz.main.app.repository.CoursesRepository;
-import kz.main.app.repository.CustomTeacherRepository;
-import kz.main.app.repository.TeacherRepository;
+import kz.main.app.service.CoursesService;
+import kz.main.app.service.TeacherService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,21 +25,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TeacherController {
 
-    private final TeacherRepository teacherRepository;
     private final CompanyRepository companyRepository;
-    private final CoursesRepository coursesRepository;
-    private final CustomTeacherRepository customTeacherRepository;
+
+    @Autowired
+    @Qualifier("MAIN")
+    private TeacherService teacherService;
+    private final CoursesService coursesService;
 
     @GetMapping(value = "/")
     public String getMain(Model model) {
-        model.addAttribute("teachers", teacherRepository.findAll(Sort.by(Sort.Direction.ASC, "id")));
+        model.addAttribute("teachers", teacherService.getAllTeachersByIdAscending());
         return "index";
     }
 
     @GetMapping(value = "/poisk")
     public String getTeachers(Model model,
                               @RequestParam String search) {
-        model.addAttribute("teachers", teacherRepository.getTeacherList(search));
+        model.addAttribute("teachers", teacherService.getAllTeachersByWord(search));
 
         return "index";
     }
@@ -46,8 +49,8 @@ public class TeacherController {
     @GetMapping(value = "/{id}")
     public String getTeacher(@PathVariable int id,
                              Model model) {
-        Teacher teacher = teacherRepository.findById(id).get();
-        List<Course> courses = coursesRepository.findAll();
+        Teacher teacher = teacherService.getTeacherById(id);
+        List<Course> courses = coursesService.getALlCourses();
         courses.removeAll(teacher.getCourses());
 
         model.addAttribute("teacher", teacher);
@@ -59,26 +62,26 @@ public class TeacherController {
 
     @PostMapping(value = "/delete")
     public String deleteTeacher(@RequestParam int id) {
-        teacherRepository.deleteById(id);
+        teacherService.deleteById(id);
         return "redirect:/";
     }
 
     @PostMapping(value = "/add")
     public String addTeacher(Teacher teacher) {
-        teacherRepository.save(teacher);
+        teacherService.addTeacher(teacher);
         return "redirect:/";
     }
 
     @GetMapping(value = "/add")
     public String addTeacherPage(Model model) {
         model.addAttribute("companies", companyRepository.findAll());
-        model.addAttribute("courses", coursesRepository.findAll());
+        model.addAttribute("courses", coursesService.getALlCourses());
         return "add-page";
     }
 
     @PostMapping(value = "/update")
     public String updateTeacher(Teacher teacher) {
-        teacherRepository.save(teacher);
+        teacherService.updateTeacher(teacher);
         return "redirect:/";
     }
 
@@ -86,12 +89,12 @@ public class TeacherController {
     public String deleteCourse(@RequestParam int course_id,
                                @RequestParam int teacher_id) {
 
-        Teacher teacher = teacherRepository.findById(teacher_id).get();
-        Course course = coursesRepository.findById(course_id).get();
+        Teacher teacher = teacherService.getTeacherById(teacher_id);
+        Course course = coursesService.findById(course_id);
 
         teacher.getCourses().remove(course);
 
-        teacherRepository.save(teacher);
+        teacherService.updateTeacher(teacher);
 
         return "redirect:/" + teacher_id;
 
@@ -101,12 +104,12 @@ public class TeacherController {
     public String addCourse(@RequestParam int course_id,
                             @RequestParam int teacher_id) {
 
-        Teacher teacher = teacherRepository.findById(teacher_id).get();
-        Course course = coursesRepository.findById(course_id).get();
+        Teacher teacher = teacherService.getTeacherById(teacher_id);
+        Course course = coursesService.findById(course_id);
 
         teacher.getCourses().add(course);
 
-        teacherRepository.save(teacher);
+        teacherService.addTeacher(teacher);
 
         return "redirect:/" + teacher_id;
 
@@ -115,7 +118,7 @@ public class TeacherController {
     @GetMapping(value = "/gpa-more")
     public String getTeachersByGpaMore(@RequestParam Double gpa,
                                        Model model) {
-        model.addAttribute("teachers", customTeacherRepository.getTeachersByGpaMore(gpa));
+        model.addAttribute("teachers", teacherService.getTeachersByGpaMore(gpa));
 
         return "index";
     }
@@ -124,14 +127,14 @@ public class TeacherController {
     public String getTeachersByGpaAndName(@RequestParam(required = false) Double gpa,
                                           @RequestParam(required = false) String fullName,
                                           Model model) {
-        model.addAttribute("teachers", customTeacherRepository.getTeachersByGpaAndFullName(gpa, fullName));
+        model.addAttribute("teachers", teacherService.getTeachersByGpaAndFullName(gpa, fullName));
 
         return "index";
     }
 
     @GetMapping(value = "/gpa-sort")
     public String getTeachersSortByGpa(Model model) {
-        model.addAttribute("teachers", customTeacherRepository.getTeachersByGpaSort());
+        model.addAttribute("teachers", teacherService.getTeachersByGpaSort());
 
         return "index";
     }
@@ -148,7 +151,7 @@ public class TeacherController {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Teacher> teacherPage = teacherRepository.findAll(pageable);
+        Page<Teacher> teacherPage = teacherService.findAllPagination(pageable);
 
         model.addAttribute("teachers", teacherPage.getContent());
 
@@ -168,7 +171,7 @@ public class TeacherController {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Teacher> teacherPage = teacherRepository.findByGpaGreaterThan(gpa, pageable);
+        Page<Teacher> teacherPage = teacherService.findByGpaGreaterThan(gpa, pageable);
 
         model.addAttribute("teachers", teacherPage.getContent());
 
