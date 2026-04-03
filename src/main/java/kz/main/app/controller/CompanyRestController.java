@@ -1,7 +1,10 @@
 package kz.main.app.controller;
 
+import kz.main.app.dto.CompanyDto;
 import kz.main.app.entity.Company;
+import kz.main.app.mapper.CompanyMapper;
 import kz.main.app.repository.CompanyRepository;
+import kz.main.app.service.impl.CompanyServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,28 +24,32 @@ import java.util.List;
 public class CompanyRestController {
 
     private final CompanyRepository companyRepository;
+    private final CompanyServiceImpl companyService;
+    private final CompanyMapper mapper;
 
     @GetMapping(value = "/all")
-    public List<Company> getAllCompanies(){
-        return companyRepository.findAll();
+    public List<CompanyDto> getAllCompanies(){
+        return mapper.toDtosList(companyRepository.findAll());
     }
 
     @GetMapping(value = "/get-id/{id}")
-    public Company getCompanyById(@PathVariable int id){
-        return companyRepository.findById(id).get();
+    public CompanyDto getCompanyById(@PathVariable int id){
+        return mapper.toDto(companyRepository.findById(id).get());
     }
 
     @PostMapping(value = "/add-company")
-    public Company addCompany(@RequestBody Company company){
+    public CompanyDto addCompany(@RequestBody CompanyDto company){
 
-        System.out.println(company);
+        Company companyModel =  companyRepository.save(mapper.toModel(company));
 
-        return companyRepository.save(company);
+        return mapper.toDto(companyModel);
     }
 
     @PutMapping(value = "/update")
-    public void updateCompany(@RequestBody Company company){
-        companyRepository.save(company);
+    public void updateCompany(@RequestBody CompanyDto company){
+
+      companyRepository.save(mapper.toModel(company));
+
     }
 
     @DeleteMapping(value = "/delete")
